@@ -1,0 +1,2 @@
+#!/bin/bash
+curl -X GET -H "Content-Type: application/json" -d '{"receiverContactId": "64d3105cb143361b6fa32c08", "senderContactId": "64d31062b143361b6fa32c0b", "body": "Hi Vanessa!"}' http://localhost:3000/messages
