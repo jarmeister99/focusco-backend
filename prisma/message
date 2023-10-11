@@ -1,0 +1,19 @@
+Environment variables loaded from ../.env
+Prisma schema loaded from schema.prisma
+Datasource "db": PostgreSQL database "dbname", schema "public" at "localhost:5432"
+
+Applying migration `20231008224055_thread`
+
+The following migration(s) have been created and applied from new schema changes:
+
+migrations/
+  └─ 20231008224055_thread/
+    └─ migration.sql
+
+Your database is now in sync with your schema.
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v5.4.1) to ./../node_modules/@prisma/client in 45ms
+
+
