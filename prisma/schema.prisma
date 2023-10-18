@@ -17,11 +17,15 @@ model User {
   messagesSent Message[] @relation("SentMessages")
   messagesReceived Message[] @relation("ReceivedMessages")
   threads Thread[] @relation("ThreadParticipants")
+  autoreply String?
+  isOwner Boolean @default(false)
 }
 
 model Message {
   id    Int      @id @default(autoincrement())
   body  String
+  isVcf Boolean @default(false)
+  mediaUrl String?
   sender User     @relation("SentMessages", fields: [senderId], references: [id])
   senderId Int
   receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id])

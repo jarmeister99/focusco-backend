@@ -27,6 +27,7 @@
     "@nestjs/platform-express": "^10.2.4",
     "@nestjs/typeorm": "^10.0.0",
     "@prisma/client": "^5.4.1",
+    "class-transformer": "^0.5.1",
     "csv-writer": "^1.6.0",
     "mongodb": "^5.7.0",
     "mongoose": "^7.4.2",
