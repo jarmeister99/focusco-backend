@@ -23,7 +23,12 @@ export class ThreadsService {
         return this.prismaService.prismaClient.thread.findMany({
             where: whereClause,
             include: {
-                messages: true,
+                messages: {
+                    include: {
+                        sender: true,
+                        receiver: true
+                    }
+                },
                 participants: true
             }
         });

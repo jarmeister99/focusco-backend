@@ -12,4 +12,27 @@ content-type: application/json
     "isOwner": true
 }
 
+###
+POST http://localhost:3000/users HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Gray Guy",
+    "number": "+15561238888"
+}
+
+###
+GET http://localhost:3000/users HTTP/1.1
+
+
+### 
+// create a message between user ID 5 and user ID 4
+POST http://localhost:3000/messages HTTP/1.1
+content-type: application/json
+
+{
+    "senderId": 6,
+    "receiverId": 4,
+    "body": "I am Johann, hello owner!!"
+}
 
