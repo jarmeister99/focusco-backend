@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Message" ALTER COLUMN "createdAt" DROP NOT NULL,
+ALTER COLUMN "updatedAt" DROP NOT NULL,
+ALTER COLUMN "isSent" DROP NOT NULL;
