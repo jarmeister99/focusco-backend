@@ -1,4 +1,4 @@
-FROM node:lts
+FROM node:18
 RUN apt-get update
 RUN apt-get install -y openssl
 
@@ -15,6 +15,12 @@ RUN npm install
 
 # Bundle app source inside Docker image
 COPY . .
+
+# Install Prisma CLI for running migrations
+RUN npm install prisma
+
+# Generate Prisma Client
+RUN npx prisma generate
 
 # Build the app
 RUN npm run build
