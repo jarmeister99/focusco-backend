@@ -1,14 +1,14 @@
-Sender Name,Sender Number,Receiver Name,Receiver Number,Body,Timestamp,Link,Is VCF
-Jared Foster,+16196037721,Owner,+18444362879,Hi,1697390960525,,false
-Jared Foster,+16196037721,Owner,+18444362879,Hello,1697391267609,,false
-Owner,+18444362879,Jared Foster,+16196037721,Here is a cat,1697592168618,https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juvenile_Ragdoll.jpg/800px-Juvenile_Ragdoll.jpg,false
-Owner,+18444362879,Jamie Boudreaux,+13347973773,Here is a cat,1697592168753,https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juvenile_Ragdoll.jpg/800px-Juvenile_Ragdoll.jpg,false
-Jamie Boudreaux,+13347973773,Owner,+18444362879,Loved “Here is a cat”,1697592181007,,false
-Owner,+18444362879,Jamie Boudreaux,+13347973773,Thanks for responding to me!,1697592181007,,false
-Jared Foster,+16196037721,Owner,+18444362879,Thanks for the cat ,1697592267435,,false
-Owner,+18444362879,Jamie Boudreaux,+13347973773,,1697592346153,,true
-Owner,+18444362879,Jared Foster,+16196037721,,1697592346155,,true
-Jamie Boudreaux,+13347973773,Owner,+18444362879,Leave me alone ,1697592370534,,false
-Jared Foster,+16196037721,Owner,+18444362879,Hi,1697592448952,,false
-Jared Foster,+16196037721,Owner,+18444362879,Okay ,1697592487954,,false
-Owner,+18444362879,Jared Foster,+16196037721,hi,1697592487954,,false
+Sender Name,Sender Number,Receiver Name,Receiver Number,Body,Media URL,Created At
+FocusCo,+18444362879,Jared Foster,+16196037721,scheduled message for jared,,Sat Oct 28 2023 12:12:37 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,https://focusco-public.s3.us-west-1.amazonaws.com/Focus+Company.vcf,,Sat Oct 28 2023 12:13:16 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,,https://focusco-public.s3.us-west-1.amazonaws.com/Focus+Company.vcf,Sat Oct 28 2023 12:13:25 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,,https://focusco-public.s3.us-west-1.amazonaws.com/Focus+Company.vcf,Sat Oct 28 2023 12:13:38 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,,https://focusco-public.s3.us-west-1.amazonaws.com/Focus+Company.vcf,Sat Oct 28 2023 12:14:12 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,Test,,Sat Oct 28 2023 12:14:44 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,foo,,Sat Oct 28 2023 12:15:43 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,sched,,Sat Oct 28 2023 12:16:32 GMT-0700 (Pacific Daylight Time)
+Jared Foster,+16196037721,FocusCo,+18444362879,Aaa,,Sat Oct 28 2023 13:18:10 GMT-0700 (Pacific Daylight Time)
+Jared Foster,+16196037721,FocusCo,+18444362879,How,,Sat Oct 28 2023 13:18:31 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,cool I guess,,Sat Oct 28 2023 13:19:42 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,broken now?,,Sat Oct 28 2023 13:19:58 GMT-0700 (Pacific Daylight Time)
+FocusCo,+18444362879,Jared Foster,+16196037721,schedule,,Sat Oct 28 2023 13:20:04 GMT-0700 (Pacific Daylight Time)

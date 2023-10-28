@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post } from "@nestjs/common";
+import { Controller, Delete, Get, Param, ParseIntPipe } from "@nestjs/common";
 import { ThreadsService } from "src/servicesv2/threads.service";
 
 @Controller('threads')
@@ -8,9 +8,8 @@ export class ThreadsController {
     // create an endpoint to get all threads
     @Get()
     async getAllThreads() {
-        return this.threadsService.getThreads({}, { ownerOnly: true });
+        return this.threadsService.getThreads({});
     }
-
 
     // Create an endpoint that gets a thread by ID
     @Get(':id')
@@ -18,7 +17,7 @@ export class ThreadsController {
         return this.threadsService.getThreads({ id });
     }
 
-    @Post('deleteAll')
+    @Delete()
     async deleteAllThreads() {
         return this.threadsService.deleteAllThreads();
     }

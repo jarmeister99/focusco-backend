@@ -23,21 +23,35 @@ model User {
 
 model Message {
   id    Int      @id @default(autoincrement())
-  body  String
-  isVcf Boolean @default(false)
+  body  String?
   mediaUrl String?
-  sender User     @relation("SentMessages", fields: [senderId], references: [id])
+  sender User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
   senderId Int
-  receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
   receiverId Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  thread Thread? @relation("ThreadMessages", fields: [threadId], references: [id])
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  thread Thread? @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
   threadId Int?
+  scheduledMessage ScheduledMessage?
+  isSent Boolean? @default(false)
 }
 
 model Thread {
   id   Int      @id @default(autoincrement())
   participants User[] @relation("ThreadParticipants")
   messages Message[] @relation("ThreadMessages")
+}
+
+model ScheduledMessage {
+  id   Int      @id @default(autoincrement())
+  scheduledAt DateTime
+  triggerAt DateTime
+  messageId Int @unique
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model PassCode {
+  id   Int      @id @default(autoincrement())
+  code String @unique
 }

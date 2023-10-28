@@ -6,6 +6,7 @@ import { PrismaService } from "./prisma.service";
 export class ThreadsService {
     constructor(private prismaService: PrismaService) { }
 
+
     async getThreads(filterData?: Partial<Thread>, options?: any): Promise<Thread[]> {
         const isOwnerCondition = {
             participants: {

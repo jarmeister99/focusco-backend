@@ -2,11 +2,67 @@ import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
 import { PrismaService } from "./prisma.service";
 
+interface CreateUserPayload {
+    name: string;
+    number: string;
+}
+
 @Injectable()
 export class UsersService {
     constructor(private prismaService: PrismaService) { }
 
-    async createUser(payload: User) {
+    async deleteAllUsers() {
+        // delete all users from the postgres database (use prisma ORM)
+
+        // Also delete all messages, threads, and contacts
+
+        await this.prismaService.prismaClient.user.deleteMany();
+
+        // create the owner
+        await this.prismaService.prismaClient.user.create({
+            data: {
+                number: process.env.TWILIO_PHONE_NUMBER,
+                name: 'FocusCo',
+                isOwner: true,
+            },
+        });
+
+        // also delete all threads (they dont cascade delete due to many to many relationship)
+        await this.prismaService.prismaClient.thread.deleteMany();
+    }
+
+    async getOwner() {
+        // get the owner of the application
+        const owner = await this.prismaService.prismaClient.user.findMany({
+            where: {
+                isOwner: true
+            }
+        });
+        return owner[0];
+    }
+
+    async getUserOrCreate(number: string) {
+        // check if the user exists
+        const users = await this.prismaService.prismaClient.user.findMany({
+            where: {
+                number: number
+            }
+        });
+        if (users.length > 0) {
+            return users[0];
+        }
+        else {
+            const user = await this.prismaService.prismaClient.user.create({
+                data: {
+                    number: number,
+                    name: number,
+                }
+            });
+            return user;
+        }
+    }
+
+    async createUser(payload: CreateUserPayload) {
         // create a new user in the postgres database (use prisma ORM)
         const result = await this.prismaService.prismaClient.user.create({
             data: payload

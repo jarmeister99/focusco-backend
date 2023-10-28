@@ -1,10 +1,54 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Post, Response } from "@nestjs/common";
 import { Message } from "@prisma/client";
-import { MessagesService } from "src/servicesv2/messages.service";
+import { Response as ExpressResponse } from 'express';
+import { CreateMessagePayload, MessagesService } from "src/servicesv2/messages.service";
+import { TwilioService } from "src/servicesv2/twilio.service";
+
 
 @Controller('messages')
 export class MessagesController {
-    constructor(private messagesService: MessagesService) { }
+    constructor(private twilioService: TwilioService, private messagesService: MessagesService) { }
+
+    @Get('export')
+    async exportMessages(@Response() res: ExpressResponse) {
+        try {
+            return await this.messagesService.exportMessages(res);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    @Delete('schedule')
+    async deleteAllScheduledMessages() {
+        try {
+            await this.messagesService.deleteAllScheduledMessages();
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    // create an endpoint for messages/schedule
+    @Post('schedule')
+    async scheduleMessages(@Body() payload: { receiverIds: number[], messagePayload: Message, triggerAt: Date }) {
+        try {
+            const { receiverIds, messagePayload, triggerAt } = payload;
+            await this.messagesService.scheduleMessages(receiverIds, messagePayload, triggerAt);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+    @Get('schedule')
+    async getScheduledMessages() {
+        try {
+            return await this.messagesService.getScheduledMessages();
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 
     @Get()
     async getMessages() {
@@ -16,21 +60,16 @@ export class MessagesController {
         }
     }
 
-    // create an endpoint that allows a user to send a message to another user
-    @Post()
-    async sendMessage(@Body() payload: Message) {
-        try {
-            await this.messagesService.sendMessage(payload);
-        }
-        catch (error) {
-            throw error;
-        }
+    @Post('webhook')
+    async receiveWebhook(@Body() data: any): Promise<any> {
+        return this.twilioService.handleWebhook(data);
     }
 
-    @Put(':id')
-    async updateMessage(@Param('id', ParseIntPipe) id: number, @Body() payload: Partial<Message>) {
+    // create an endpoint that allows a user to send a message to another user
+    @Post()
+    async sendMessage(@Body() payload: CreateMessagePayload) {
         try {
-            await this.messagesService.updateMessage(id, payload);
+            await this.messagesService.sendMessage(payload);
         }
         catch (error) {
             throw error;
