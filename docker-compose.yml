@@ -28,7 +28,7 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - ./dist/frontend:/usr/share/nginx/html
+      - ./frontend:/usr/share/nginx/html
     ports:
       - 80:80
     depends_on:
