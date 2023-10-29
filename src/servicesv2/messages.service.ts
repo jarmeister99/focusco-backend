@@ -30,7 +30,7 @@ export class MessagesService {
     constructor(@Inject(forwardRef(() => TwilioService)) private twilioService: TwilioService, private prismaService: PrismaService, private threadsService: ThreadsService, private usersService: UsersService) { }
 
     async exportMessages(res: ExpressResponse) {
-        const messages = await this.getMessages() as MessageWithRelations[];
+        const messages = await this.getMessages({ isSent: true }) as MessageWithRelations[];
         const csvWriter = createObjectCsvWriter({
             path: 'messageExport.csv',
             header: [
@@ -40,7 +40,7 @@ export class MessagesService {
                 { id: 'receiverNumber', title: 'Receiver Number' },
                 { id: 'body', title: 'Body' },
                 { id: 'mediaUrl', title: 'Media URL' },
-                { id: 'createdAt', title: 'Created At' },
+                { id: 'createdAt', title: 'Updated At' },
             ],
         });
         // sort the messages by created at date
@@ -55,7 +55,7 @@ export class MessagesService {
                 receiverNumber: message.receiver.number,
                 body: message.body,
                 mediaUrl: message.mediaUrl,
-                createdAt: message.createdAt
+                createdAt: message.updatedAt
             }
         })
         csvWriter.writeRecords(formattedMessages).then(() => {
