@@ -12,7 +12,7 @@ content-type: application/json
 }
 
 ###
-DELETE http://localhost:3000/users HTTP/1.1
+GET http://localhost:3000/users HTTP/1.1
 content-type: application/json
 
 
@@ -22,7 +22,8 @@ content-type: application/json
 
 {
     "name": "Owner",
-    "number": "+15561238888"
+    "number": "+18444362879",
+    "isOwner": true
 }
 
 ###
