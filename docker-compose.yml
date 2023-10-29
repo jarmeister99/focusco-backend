@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: dbname
     ports: 
       - 5432:5432
+    volumes:
+      - db-data:/var/lib/postgresql/data
 
   adminer:
     image: adminer
@@ -33,3 +35,6 @@ services:
       - 80:80
     depends_on:
       - focusco-backend
+
+volumes:
+  db-data:
