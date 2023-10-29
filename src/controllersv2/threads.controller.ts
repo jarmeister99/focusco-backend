@@ -1,7 +1,7 @@
 import { Controller, Delete, Get, Param, ParseIntPipe } from "@nestjs/common";
 import { ThreadsService } from "src/servicesv2/threads.service";
 
-@Controller('threads')
+@Controller('api/threads')
 export class ThreadsController {
     constructor(private threadsService: ThreadsService) { }
 

@@ -5,7 +5,7 @@ import { CreateMessagePayload, MessagesService } from "src/servicesv2/messages.s
 import { TwilioService } from "src/servicesv2/twilio.service";
 
 
-@Controller('messages')
+@Controller('api/messages')
 export class MessagesController {
     constructor(private twilioService: TwilioService, private messagesService: MessagesService) { }
 
