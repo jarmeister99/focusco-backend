@@ -4,6 +4,19 @@ content-type: application/json
 {
 }
 ###
+
+POST http://localhost:3000/api/messages/webhook HTTP/1.1
+content-type: application/json
+
+{
+    "From": "+16196037721",
+    "To": "+18444362879",
+    "Body": "Is this working"
+}
+
+###
+
+
 GET http://localhost:3000/api/users HTTP/1.1
 content-type: application/json
 
@@ -29,11 +42,11 @@ GET http://localhost:3000/users HTTP/1.1
 
 ### 
 // create a message between user ID 5 and user ID 4
-POST http://localhost:3000/auth/check HTTP/1.1
+POST http://localhost:3000/api/auth/passcode HTTP/1.1
 content-type: application/json
 
 {
-    "passcode": "HHkTWsCTmF6hyh5"
+    "passcode": "123"
 }
 
 ###

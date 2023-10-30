@@ -45,11 +45,13 @@ export class TwilioService {
                 body: senderContact.autoreply,
                 mediaUrl: '',
             }
-            this.messagesService.sendMessage(autoreplyMessagePayload).then((message) => {
-                this.sendTwilioMessage(message);
-                this.messagesService.markMessageAsSent(message.id);
-                this.usersService.updateUser(senderContact.id, { autoreply: '' });
+            this.usersService.updateUser(senderContact.id, { autoreply: '' }).then(() => {
+                this.messagesService.sendMessage(autoreplyMessagePayload).then((message) => {
+                    this.sendTwilioMessage(message);
+                    this.messagesService.markMessageAsSent(message.id);
+                });
             });
+
         }
     }
 
@@ -80,6 +82,7 @@ export class TwilioService {
             from: process.env.TWILIO_PHONE_NUMBER,
             body: body,
             mediaUrl: [filePath],
+            sendAsMms: true,
         });
     }
 }
