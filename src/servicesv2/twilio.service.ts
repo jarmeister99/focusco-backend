@@ -20,9 +20,6 @@ export class TwilioService {
 
     // Twilio calls this
     async handleWebhook(data: any): Promise<void> {
-        Logger.log('  ~~~~~~~~~~~~~~~~~~~~~    ')
-        Logger.log('TwilioService.handleWebhook');
-        Logger.log('  ~~~~~~~~~~~~~~~~~~~~~    ')
         const senderNumber = data.From;
 
         const ownerContact = await this.usersService.getOwner();
@@ -61,6 +58,11 @@ export class TwilioService {
     async sendTwilioMessage(message: Message) {
         const receivers = await this.usersService.getUsers({ id: message.receiverId });
         const receiver = receivers[0];
+
+        Logger.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+        Logger.log(`Sending message to ${receiver.number}`);
+        Logger.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+
 
         if (message.mediaUrl) {
             return this.sendFile(receiver.number, message.body, message.mediaUrl);
