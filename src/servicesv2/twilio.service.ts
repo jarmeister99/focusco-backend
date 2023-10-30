@@ -20,7 +20,9 @@ export class TwilioService {
 
     // Twilio calls this
     async handleWebhook(data: any): Promise<void> {
-        Logger.log(data, 'TwilioService.handleWebhook');
+        Logger.log('  ~~~~~~~~~~~~~~~~~~~~~    ')
+        Logger.log('TwilioService.handleWebhook');
+        Logger.log('  ~~~~~~~~~~~~~~~~~~~~~    ')
         const senderNumber = data.From;
 
         const ownerContact = await this.usersService.getOwner();
