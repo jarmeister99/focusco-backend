@@ -1,5 +1,5 @@
 // src/twilio/twilio.service.ts
-import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Message } from '@prisma/client';
 import * as Twilio from 'twilio';
@@ -47,7 +47,6 @@ export class TwilioService {
             }
             this.usersService.updateUser(senderContact.id, { autoreply: '' }).then(() => {
                 this.messagesService.sendMessage(autoreplyMessagePayload).then((message) => {
-                    this.sendTwilioMessage(message);
                     this.messagesService.markMessageAsSent(message.id);
                 });
             });
@@ -58,11 +57,6 @@ export class TwilioService {
     async sendTwilioMessage(message: Message) {
         const receivers = await this.usersService.getUsers({ id: message.receiverId });
         const receiver = receivers[0];
-
-        Logger.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-        Logger.log(`Sending message to ${receiver.number}`);
-        Logger.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-
 
         if (message.mediaUrl) {
             return this.sendFile(receiver.number, message.body, message.mediaUrl);
