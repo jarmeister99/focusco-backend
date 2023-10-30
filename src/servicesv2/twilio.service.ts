@@ -1,5 +1,5 @@
 // src/twilio/twilio.service.ts
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Message } from '@prisma/client';
 import * as Twilio from 'twilio';
@@ -20,6 +20,7 @@ export class TwilioService {
 
     // Twilio calls this
     async handleWebhook(data: any): Promise<void> {
+        Logger.log(data, 'TwilioService.handleWebhook');
         const senderNumber = data.From;
 
         const ownerContact = await this.usersService.getOwner();
