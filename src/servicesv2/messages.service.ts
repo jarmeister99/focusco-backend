@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
+import { HttpException, HttpStatus, Inject, Injectable, Logger, forwardRef } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { Message, Prisma } from "@prisma/client";
 import { createObjectCsvWriter } from "csv-writer";
@@ -114,6 +114,7 @@ export class MessagesService {
         const message = await this.createMessage(payload);
         await this.attachMessageToThreadOrCreateNewThread(message.id);
         await this.markMessageAsSent(message.id);
+        Logger.log('Received message')
         await this.appGateway.sendEventToClient(message);
     }
 
