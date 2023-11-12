@@ -1,15 +1,41 @@
 import { Injectable } from "@nestjs/common";
 import { User } from "@prisma/client";
+import { CreateUserPayload } from "src/models/api_payloads";
 import { PrismaService } from "./prisma.service";
 
-interface CreateUserPayload {
-    name: string;
-    number: string;
-}
 
 @Injectable()
 export class UsersService {
     constructor(private prismaService: PrismaService) { }
+
+    async deleteUser(userId: number) {
+        // Get all the threads associated with the user
+        const userThreads = await this.prismaService.prismaClient.thread.findMany({
+            where: {
+                participants: {
+                    some: {
+                        id: userId
+                    }
+                }
+            }
+        });
+
+        // Delete all threads associated with the user
+        for (const thread of userThreads) {
+            await this.prismaService.prismaClient.thread.delete({
+                where: {
+                    id: thread.id
+                }
+            });
+        }
+
+        // Delete the user
+        await this.prismaService.prismaClient.user.delete({
+            where: {
+                id: userId
+            }
+        });
+    }
 
     async deleteAllUsers() {
         // delete all users from the postgres database (use prisma ORM)
@@ -63,13 +89,26 @@ export class UsersService {
     }
 
     async createUser(payload: CreateUserPayload) {
-        // create a new user in the postgres database (use prisma ORM)
-        const result = await this.prismaService.prismaClient.user.create({
-            data: payload
-        }).catch((error) => {
-            throw new Error('Unable to create user');
+        const { name, number, cohort } = payload;
+
+        // Create a new user
+        const newUser = await this.prismaService.prismaClient.user.create({
+            data: {
+                name,
+                number,
+            },
         });
-        return result;
+
+        // If a cohort is provided, create a relation between the user and the cohort
+        if (cohort) {
+            await this.prismaService.prismaClient.cohortUser.create({
+                data: {
+                    userId: newUser.id,
+                    cohortId: cohort.id,
+                },
+            });
+        }
+        return newUser;
     }
 
     async getUsers(filterData?: Partial<User>): Promise<User[]> {
@@ -81,6 +120,11 @@ export class UsersService {
                 messagesSent: true,
                 messagesReceived: true,
                 threads: true,
+                cohorts: {
+                    include: {
+                        cohort: true
+                    }
+                },
             }
         });
     }

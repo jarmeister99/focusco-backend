@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Post, Response } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Response } from "@nestjs/common";
 import { Message } from "@prisma/client";
 import { Response as ExpressResponse } from 'express';
-import { CreateMessagePayload, MessagesService } from "src/servicesv2/messages.service";
+import { CreateMessagePayload, ScheduleMessagesPayload } from "src/models/api_payloads";
+import { MessagesService } from "src/servicesv2/messages.service";
 import { TwilioService } from "src/servicesv2/twilio.service";
 
 
@@ -31,7 +32,7 @@ export class MessagesController {
 
     // create an endpoint for messages/schedule
     @Post('schedule')
-    async scheduleMessages(@Body() payload: { receiverIds: number[], messagePayload: Message, triggerAt: Date }) {
+    async scheduleMessages(@Body() payload: ScheduleMessagesPayload) {
         try {
             const { receiverIds, messagePayload, triggerAt } = payload;
             await this.messagesService.scheduleMessages(receiverIds, messagePayload, triggerAt);
@@ -80,6 +81,26 @@ export class MessagesController {
     async deleteAllMessages() {
         try {
             await this.messagesService.deleteAllMessages();
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    @Delete(':id')
+    async deleteUser(@Param('id', ParseIntPipe) id: number) {
+        try {
+            await this.messagesService.deleteMessage(id);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    @Put(':id')
+    async editMessage(@Param('id', ParseIntPipe) id: number, @Body() payload: Partial<Message>) {
+        try {
+            await this.messagesService.editMessage(id, payload);
         }
         catch (error) {
             throw error;

@@ -1,10 +1,21 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from "@nestjs/common";
 import { User } from "@prisma/client";
+import { CreateUserPayload } from "src/models/api_payloads";
 import { UsersService } from "src/servicesv2/users.service";
 
 @Controller('api/users')
 export class UsersController {
     constructor(private usersService: UsersService) { }
+
+    @Delete(':id')
+    async deleteUser(@Param('id', ParseIntPipe) id: number) {
+        try {
+            await this.usersService.deleteUser(id);
+        }
+        catch (error) {
+            throw error;
+        }
+    }
 
     @Delete()
     async deleteAllUsers() {
@@ -17,7 +28,7 @@ export class UsersController {
     }
 
     @Post()
-    async createUser(@Body() payload: User) {
+    async createUser(@Body() payload: CreateUserPayload) {
         try {
             await this.usersService.createUser(payload);
         }

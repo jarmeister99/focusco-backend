@@ -1,21 +1,16 @@
 import { HttpException, HttpStatus, Inject, Injectable, forwardRef } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { Message, Prisma, ScheduledMessage } from "@prisma/client";
+import { Message, Prisma } from "@prisma/client";
 import { createObjectCsvWriter } from "csv-writer";
 import { Response as ExpressResponse } from 'express';
 import { createReadStream } from "fs";
+import { AppGateway } from "src/app.gateway";
+import { CreateMessagePayload } from "src/models/api_payloads";
 import { PrismaService } from "./prisma.service";
 import { ThreadsService } from "./threads.service";
 import { TwilioService } from "./twilio.service";
 import { UsersService } from "./users.service";
 
-
-export interface CreateMessagePayload {
-    senderId: number;
-    receiverId: number;
-    body: string;
-    mediaUrl: string;
-}
 
 type MessageWithRelations = Prisma.MessageGetPayload<{
     include: {
@@ -27,7 +22,51 @@ type MessageWithRelations = Prisma.MessageGetPayload<{
 
 @Injectable()
 export class MessagesService {
-    constructor(@Inject(forwardRef(() => TwilioService)) private twilioService: TwilioService, private prismaService: PrismaService, private threadsService: ThreadsService, private usersService: UsersService) { }
+    constructor(@Inject(forwardRef(() => TwilioService)) private twilioService: TwilioService, private prismaService: PrismaService, private threadsService: ThreadsService, private usersService: UsersService, private appGateway: AppGateway) { }
+
+    async exportMessagesByCohort(res: ExpressResponse, cohortId: number) {
+        const messages = await this.getMessagesByCohort(cohortId) as MessageWithRelations[];
+
+        const csvWriter = createObjectCsvWriter({
+            path: 'messageExport.csv',
+            header: [
+                { id: 'senderName', title: 'Sender Name' },
+                { id: 'senderNumber', title: 'Sender Number' },
+                { id: 'receiverName', title: 'Receiver Name' },
+                { id: 'receiverNumber', title: 'Receiver Number' },
+                { id: 'body', title: 'Body' },
+                { id: 'mediaUrl', title: 'Media URL' },
+                { id: 'createdAt', title: 'Updated At' },
+            ],
+        });
+
+        // sort the messages by created at date
+        messages.sort((a, b) => {
+            return a.updatedAt.getTime() - b.updatedAt.getTime();
+        });
+        const formattedMessages = messages.map((message) => {
+            return {
+                senderName: message.sender.name,
+                senderNumber: message.sender.number,
+                receiverName: message.receiver.name,
+                receiverNumber: message.receiver.number,
+                body: message.body,
+                mediaUrl: message.mediaUrl,
+                createdAt: message.updatedAt
+            }
+        })
+        csvWriter.writeRecords(formattedMessages).then(() => {
+            // Set response headers for file download
+            res.set('Content-Type', 'text/csv');
+            res.set(
+                'Content-Disposition',
+                'attachment; filename=messageExport.csv',
+            );
+            const fileStream = createReadStream('messageExport.csv');
+            fileStream.pipe(res);
+        });
+
+    }
 
     async exportMessages(res: ExpressResponse) {
         const messages = await this.getMessages({ isSent: true }) as MessageWithRelations[];
@@ -45,7 +84,7 @@ export class MessagesService {
         });
         // sort the messages by created at date
         messages.sort((a, b) => {
-            return a.createdAt.getTime() - b.createdAt.getTime();
+            return a.updatedAt.getTime() - b.updatedAt.getTime();
         });
         const formattedMessages = messages.map((message) => {
             return {
@@ -75,6 +114,7 @@ export class MessagesService {
         const message = await this.createMessage(payload);
         await this.attachMessageToThreadOrCreateNewThread(message.id);
         await this.markMessageAsSent(message.id);
+        await this.appGateway.sendEventToClient(message);
     }
 
     async sendMessage(payload: CreateMessagePayload) {
@@ -174,6 +214,44 @@ export class MessagesService {
         });
     }
 
+    async getMessagesByCohort(cohortId: number): Promise<Message[]> {
+        const cohortUsers = await this.prismaService.prismaClient.cohortUser.findMany({
+            where: {
+                cohortId
+            },
+            include: {
+                user: {
+                    include: {
+                        messagesReceived: {
+                            include: {
+                                sender: true,
+                                receiver: true,
+                            }
+                        },
+                        messagesSent: {
+                            include: {
+                                sender: true,
+                                receiver: true,
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        return cohortUsers.map((cohortUser) => {
+            return [...cohortUser.user.messagesReceived, ...cohortUser.user.messagesSent];
+        }).flat();
+    }
+
+    async deleteMessage(messageId: number) {
+        // delete a message from the postgres database (use prisma ORM)
+        return this.prismaService.prismaClient.message.delete({
+            where: {
+                id: messageId
+            }
+        });
+    }
+
     async deleteAllMessages() {
         // delete all messages from the postgres database (use prisma ORM)
         // also include all relations
@@ -182,7 +260,14 @@ export class MessagesService {
 
     async deleteAllScheduledMessages() {
         // delete all scheduled messages from the postgres database (use prisma ORM)
-        return this.prismaService.prismaClient.scheduledMessage.deleteMany();
+        return this.prismaService.prismaClient.message.deleteMany({
+            where: {
+                isSent: false,
+                triggerAt: {
+                    not: null
+                }
+            }
+        });
     }
 
     async scheduleMessages(receiverIds: number[], messagePayload: Partial<CreateMessagePayload>, triggerAt: Date) {
@@ -204,18 +289,17 @@ export class MessagesService {
 
     }
 
-    async getScheduledMessages(): Promise<ScheduledMessage[]> {
+    async getScheduledMessages(): Promise<Message[]> {
         // get all scheduled messages from the postgres database (use prisma ORM)
         // also include all relations
-        return this.prismaService.prismaClient.scheduledMessage.findMany({
+        return this.prismaService.prismaClient.message.findMany({
+            where: {
+                isSent: false,
+            },
             include: {
-                message: {
-                    include: {
-                        sender: true,
-                        receiver: true,
-                        thread: true
-                    }
-                }
+                sender: true,
+                receiver: true,
+                thread: true
             }
         });
     };
@@ -233,55 +317,54 @@ export class MessagesService {
         return newMessage;
     }
 
-    async createScheduledMessage(messagePayload: CreateMessagePayload, triggerAt: Date): Promise<ScheduledMessage> {
-        const message = await this.createMessage(messagePayload);
-        const newScheduledMessage = await this.prismaService.prismaClient.scheduledMessage.create({
+    async createScheduledMessage(messagePayload: CreateMessagePayload, triggerAt: Date): Promise<Message> {
+        const newScheduledMessage = await this.prismaService.prismaClient.message.create({
             data: {
                 scheduledAt: new Date(),
                 triggerAt,
-                messageId: message.id
+                body: messagePayload.body,
+                mediaUrl: messagePayload.mediaUrl,
+                senderId: messagePayload.senderId,
+                receiverId: messagePayload.receiverId,
+                isSent: false,
             },
         });
 
         return newScheduledMessage;
     }
 
-    @Cron(CronExpression.EVERY_5_SECONDS)
+    @Cron(CronExpression.EVERY_10_SECONDS)
     async checkScheduledMessages() {
-        const scheduledMessages = await this.prismaService.prismaClient.scheduledMessage.findMany({
+        const scheduledMessages = await this.prismaService.prismaClient.message.findMany({
             where: {
                 triggerAt: {
                     lte: new Date()
                 },
+                isSent: false
             },
             include: {
-                message: {
-                    include: {
-                        sender: true,
-                        receiver: true,
-                        thread: true
-                    }
-                }
+                sender: true,
+                receiver: true,
             }
         });
-        for (const scheduledMessage of scheduledMessages) {
-            const { message } = scheduledMessage;
-
-
-            if (message.isSent) {
-                // if the message has already been sent, then delete the scheduled message
-                await this.prismaService.prismaClient.scheduledMessage.delete({
-                    where: {
-                        id: scheduledMessage.id
-                    }
-                });
-                continue;
-            }
-            else {
-                this.sendExistingMessage(message);
-            }
+        const promises = scheduledMessages.map(scheduledMessage => this.sendExistingMessage(scheduledMessage));
+        if (promises.length > 0) {
+            Promise.all(promises).then(() => {
+                this.appGateway.sendEventToClient(scheduledMessages);
+            });
         }
     }
 
+    async editMessage(messageId: number, messagePayload: Partial<Message>) {
+        // edit a message from the postgres database (use prisma ORM)
+        return this.prismaService.prismaClient.message.update({
+            where: {
+                id: messageId
+            },
+            data: {
+                ...messagePayload
+            }
+        });
+    }
 }
 

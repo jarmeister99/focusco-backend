@@ -1,20 +1,33 @@
-DELETE http://localhost:3000/api/users HTTP/1.1
+get http://localhost:3000/api/messages/schedule HTTP/1.1
 content-type: application/json
 
 {
 }
 ###
 
+DELETE http://localhost:3000/api/threads HTTP/1.1
+
+###
+
+POST http://localhost:3000/api/auth/passcode HTTP/1.1
+content-type: application/json
+
+{
+    "passcode": "123"
+}
+###
 POST http://localhost:3000/api/messages/webhook HTTP/1.1
 content-type: application/json
 
 {
     "From": "+16196037721",
     "To": "+18444362879",
-    "Body": "Is this working"
+    "Body": "hi focusco"
 }
 
 ###
+
+GET http://localhost:3000/api/users HTTP/1.1
 
 
 GET http://localhost:3000/api/users HTTP/1.1
@@ -46,7 +59,7 @@ POST http://localhost:3000/api/auth/passcode HTTP/1.1
 content-type: application/json
 
 {
-    "passcode": "getfocused"
+    "passcode": "123"
 }
 
 ###

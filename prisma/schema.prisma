@@ -10,6 +10,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Cohort {
+  id   Int      @id @default(autoincrement())
+  name  String
+  users CohortUser[]
+  description String?
+  isArchived Boolean @default(false)
+  startDate DateTime?
+  endDate DateTime? 
+}
+
 model User {
   id    Int      @id @default(autoincrement())
   number String   @unique
@@ -19,6 +29,17 @@ model User {
   threads Thread[] @relation("ThreadParticipants")
   autoreply String?
   isOwner Boolean @default(false)
+  cohorts CohortUser[]
+  adminNote String?
+}
+
+model CohortUser {
+  userId   Int
+  cohortId Int
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cohort   Cohort  @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+
+  @@id([userId, cohortId])
 }
 
 model Message {
@@ -33,7 +54,8 @@ model Message {
   updatedAt DateTime? @updatedAt
   thread Thread? @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
   threadId Int?
-  scheduledMessage ScheduledMessage?
+  scheduledAt DateTime?
+  triggerAt DateTime?
   isSent Boolean? @default(false)
 }
 
@@ -41,14 +63,6 @@ model Thread {
   id   Int      @id @default(autoincrement())
   participants User[] @relation("ThreadParticipants")
   messages Message[] @relation("ThreadMessages")
-}
-
-model ScheduledMessage {
-  id   Int      @id @default(autoincrement())
-  scheduledAt DateTime
-  triggerAt DateTime
-  messageId Int @unique
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
 }
 
 model PassCode {

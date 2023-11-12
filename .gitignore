@@ -37,3 +37,4 @@ lerna-debug.log*
 .env
 
 pgdata/
+api_testing/users.http
