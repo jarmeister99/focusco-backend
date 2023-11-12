@@ -22,7 +22,7 @@ content-type: application/json
 {
     "From": "+16196037721",
     "To": "+18444362879",
-    "Body": "hi foaaacusco"
+    "Body": "123"
 }
 
 ###
