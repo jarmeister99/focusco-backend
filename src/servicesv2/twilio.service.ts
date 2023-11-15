@@ -31,7 +31,7 @@ export class TwilioService {
             receiverId: ownerContact.id,
             senderId: senderContact.id,
             body: data.Body,
-            mediaUrl: '',
+            mediaUrl: data.MediaUrl0,
         }
 
 
