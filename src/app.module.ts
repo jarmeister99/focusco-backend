@@ -50,6 +50,7 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(AuthMiddleware)
+      .exclude('api/messages/webhook')
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }
