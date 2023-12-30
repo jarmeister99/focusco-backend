@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppGateway } from './app.gateway';
@@ -7,6 +7,7 @@ import { CohortsController } from './controllersv2/cohorts.controller';
 import { MessagesController } from './controllersv2/messages.controller';
 import { ThreadsController } from './controllersv2/threads.controller';
 import { UsersController } from './controllersv2/users.controller';
+import { AuthMiddleware } from './middleware/auth.middleware';
 import { AuthService } from './servicesv2/auth.service';
 import { CohortsService } from './servicesv2/cohorts.service';
 import { MessagesService } from './servicesv2/messages.service';
@@ -44,5 +45,11 @@ import { UsersService } from './servicesv2/users.service';
 })
 export class AppModule {
   constructor(private configService: ConfigService) {
+
+  }
+  configure(consumer: MiddlewareConsumer): void {
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }
