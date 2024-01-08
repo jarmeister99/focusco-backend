@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AppGateway } from './app.gateway';
-import { AuthController } from './controllersv2/auth.controller';
 import { CohortsController } from './controllersv2/cohorts.controller';
 import { MessagesController } from './controllersv2/messages.controller';
 import { ThreadsController } from './controllersv2/threads.controller';
@@ -27,7 +26,6 @@ import { UsersService } from './servicesv2/users.service';
     UsersController,
     MessagesController,
     ThreadsController,
-    AuthController,
     CohortsController
 
   ],
