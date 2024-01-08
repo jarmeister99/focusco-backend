@@ -1,0 +1,4 @@
+To migrate, in the environment set DATABASE_URL="postgresql://exampleuser:examplepass@localhost:5432/dbname?schema=public"
+It is important to use localhost instead of db here
+
+Then, npx prisma migrate dev --name autoreply
