@@ -11,61 +11,119 @@ datasource db {
 }
 
 model Cohort {
-  id   Int      @id @default(autoincrement())
-  name  String
-  users CohortUser[]
+  id          Int          @id @default(autoincrement())
+  name        String
+  users       CohortUser[]
   description String?
-  isArchived Boolean @default(false)
-  startDate DateTime?
-  endDate DateTime? 
+  isArchived  Boolean      @default(false)
+  startDate   DateTime?
+  endDate     DateTime?
 }
 
 model User {
-  id    Int      @id @default(autoincrement())
-  number String   @unique
-  name  String?
-  messagesSent Message[] @relation("SentMessages")
-  messagesReceived Message[] @relation("ReceivedMessages")
-  threads Thread[] @relation("ThreadParticipants")
-  autoreply String?
-  isOwner Boolean @default(false)
-  cohorts CohortUser[]
-  adminNote String?
+  id                        Int                        @id @default(autoincrement())
+  number                    String                     @unique
+  name                      String?
+  messagesSent              Message[]                  @relation("SentMessages")
+  messagesReceived          Message[]                  @relation("ReceivedMessages")
+  threads                   Thread[]                   @relation("ThreadParticipants")
+  autoreply                 String?
+  isOwner                   Boolean                    @default(false)
+  cohorts                   CohortUser[]
+  adminNote                 String?
+  sentScheduledMessages     ScheduledMessage[]         @relation("ScheduledMessageToUserSender")
+  receivedScheduledMessages ScheduledMessage[]         @relation("ScheduledMessageToUserReceiver")
+  sentMessages              SentMessage[]              @relation("SentMessageToUserSender")
+  receivedMessages          SentMessage[]              @relation("SentMessageToUserReceiver")
+  autoreplyRules            UserAutoreplyMessageRule[]
 }
 
 model CohortUser {
   userId   Int
   cohortId Int
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  cohort   Cohort  @relation(fields: [cohortId], references: [id], onDelete: Cascade)
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cohort   Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
 
   @@id([userId, cohortId])
 }
 
 model Message {
-  id    Int      @id @default(autoincrement())
-  body  String?
-  mediaUrl String?
-  sender User     @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId Int
-  receiver User   @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId Int
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  thread Thread? @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
-  threadId Int?
+  id          Int       @id @default(autoincrement())
+  body        String?
+  mediaUrl    String?
+  sender      User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  senderId    Int
+  receiver    User      @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+  receiverId  Int
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  thread      Thread?   @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
+  threadId    Int?
   scheduledAt DateTime?
-  triggerAt DateTime?
-  isSent Boolean? @default(false)
+  triggerAt   DateTime?
+  isSent      Boolean?  @default(false)
 }
 
 model Thread {
-  id   Int      @id @default(autoincrement())
-  participants User[] @relation("ThreadParticipants")
-  messages Message[] @relation("ThreadMessages")
+  id           Int       @id @default(autoincrement())
+  participants User[]    @relation("ThreadParticipants")
+  messages     Message[] @relation("ThreadMessages")
 }
 
 model PassCode {
-  id   Int      @id @default(autoincrement())
+  id   Int    @id @default(autoincrement())
   code String @unique
+}
+
+model MessageTemplate {
+  id                   Int                    @id @default(autoincrement())
+  body                 String
+  mediaUrl             String?
+  ScheduledMessage     ScheduledMessage[]
+  SentMessage          SentMessage[]
+  AutoreplyMessageRule AutoreplyMessageRule[]
+}
+
+model ScheduledMessage {
+  id                Int             @id @default(autoincrement())
+  messageTemplateId Int
+  messageTemplate   MessageTemplate @relation(fields: [messageTemplateId], references: [id])
+  triggerAt         DateTime
+  isSent            Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime?       @updatedAt
+  senderId          Int
+  sender            User            @relation("ScheduledMessageToUserSender", fields: [senderId], references: [id])
+  receiverId        Int
+  receiver          User            @relation("ScheduledMessageToUserReceiver", fields: [receiverId], references: [id])
+}
+
+model SentMessage {
+  id                Int             @id @default(autoincrement())
+  messageTemplateId Int
+  messageTemplate   MessageTemplate @relation(fields: [messageTemplateId], references: [id])
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime?       @updatedAt
+  senderId          Int
+  sender            User            @relation("SentMessageToUserSender", fields: [senderId], references: [id])
+  receiverId        Int
+  receiver          User            @relation("SentMessageToUserReceiver", fields: [receiverId], references: [id])
+}
+
+model AutoreplyMessageRule {
+  id                Int                        @id @default(autoincrement())
+  messageTemplateId Int
+  messageTemplate   MessageTemplate            @relation(fields: [messageTemplateId], references: [id])
+  startDate         DateTime
+  endDate           DateTime
+  users             UserAutoreplyMessageRule[]
+}
+
+model UserAutoreplyMessageRule {
+  userId                 Int
+  user                   User                 @relation(fields: [userId], references: [id])
+  autoreplyMessageRuleId Int
+  autoreplyMessageRule   AutoreplyMessageRule @relation(fields: [autoreplyMessageRuleId], references: [id])
+
+  @@id([userId, autoreplyMessageRuleId])
 }
