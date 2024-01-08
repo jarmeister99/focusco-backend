@@ -70,11 +70,6 @@ model Thread {
   messages     Message[] @relation("ThreadMessages")
 }
 
-model PassCode {
-  id   Int    @id @default(autoincrement())
-  code String @unique
-}
-
 model MessageTemplate {
   id                   Int                    @id @default(autoincrement())
   body                 String
