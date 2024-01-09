@@ -7,7 +7,6 @@ import { MessagesController } from './controllersv2/messages.controller';
 import { ThreadsController } from './controllersv2/threads.controller';
 import { UsersController } from './controllersv2/users.controller';
 import { AuthMiddleware } from './middleware/auth.middleware';
-import { AuthService } from './servicesv2/auth.service';
 import { CohortsService } from './servicesv2/cohorts.service';
 import { MessagesService } from './servicesv2/messages.service';
 import { PrismaService } from './servicesv2/prisma.service';
@@ -36,7 +35,6 @@ import { UsersService } from './servicesv2/users.service';
     MessagesService,
     ThreadsService,
     TwilioService,
-    AuthService,
     AppGateway,
     CohortsService
   ],
