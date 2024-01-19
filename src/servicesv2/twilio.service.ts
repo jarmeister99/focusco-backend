@@ -37,8 +37,12 @@ export class TwilioService {
 
         this.messagesService.receiveMessage(messagePayload);
 
+        // create a variable named parsedBody that is messagePayload.body to lowercase with surrounding whitespace removed
+        const parsedBody = messagePayload.body.toLowerCase().trim();
+        const ignoreWords = ['switch', 'balance']
+
         // Now, handle any autoreply that may occur
-        if (senderContact.autoreply) {
+        if (senderContact.autoreply && !ignoreWords.includes(parsedBody)) {
             const autoreplyMessagePayload = {
                 receiverId: senderContact.id,
                 senderId: ownerContact.id,
