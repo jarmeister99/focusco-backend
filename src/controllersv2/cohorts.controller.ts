@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Response } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Response } from "@nestjs/common";
 import { Response as ExpressResponse } from 'express';
-import { AddUserToCohortPayload, CreateCohortPayload, DeleteCohortPayload, RemoveUserFromCohortPayload, UpdateCohortPayload } from "src/models/api_payloads";
+import { AddUserToCohortDto, CreateCohortDto, RemoveUserFromCohortDto } from "focusco-lib";
 import { CohortsService } from "src/servicesv2/cohorts.service";
 import { MessagesService } from "src/servicesv2/messages.service";
 
@@ -14,39 +14,23 @@ export class CohortsController {
     }
 
     @Post()
-    async createCohort(@Body() payload: CreateCohortPayload) {
+    async createCohort(@Body() payload: CreateCohortDto) {
         return await this.cohortsService.createCohort(payload);
     }
 
     @Post('addUser')
-    async addUserToCohort(@Body() payload: AddUserToCohortPayload) {
+    async addUserToCohort(@Body() payload: AddUserToCohortDto) {
         return await this.cohortsService.addUserToCohort(payload);
     }
 
     @Post('removeUser')
-    async removeUserFromCohort(@Body() payload: RemoveUserFromCohortPayload) {
+    async removeUserFromCohort(@Body() payload: RemoveUserFromCohortDto) {
         return await this.cohortsService.removeUserFromCohort(payload);
-    }
-
-    @Post('delete')
-    async deleteCohort(@Body() payload: DeleteCohortPayload) {
-        return await this.cohortsService.deleteCohort(payload);
-    }
-
-    // Create an endpoint that gets a thread by ID
-    @Put(':id')
-    async updateCohort(@Param('id', ParseIntPipe) id: number, @Body() payload: UpdateCohortPayload) {
-        return this.cohortsService.updateCohort(id, payload);
     }
 
     @Get()
     async getAllCohorts() {
         return await this.cohortsService.getAllCohorts();
-    }
-
-    @Delete()
-    async deleteAllCohorts() {
-        return await this.cohortsService.deleteAllCohorts();
     }
 
     @Delete(':id')

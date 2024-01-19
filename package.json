@@ -41,7 +41,8 @@
     "rxjs": "^7.8.1",
     "twilio": "^4.15.0",
     "typeorm": "^0.3.17",
-    "util": "^0.12.5"
+    "util": "^0.12.5",
+    "focusco-lib": "file:../focusco-lib"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

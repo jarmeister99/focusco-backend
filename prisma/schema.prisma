@@ -23,11 +23,7 @@ model Cohort {
 model User {
   id                        Int                        @id @default(autoincrement())
   number                    String                     @unique
-  name                      String?
-  messagesSent              Message[]                  @relation("SentMessages")
-  messagesReceived          Message[]                  @relation("ReceivedMessages")
-  threads                   Thread[]                   @relation("ThreadParticipants")
-  autoreply                 String?
+  name                      String
   isOwner                   Boolean                    @default(false)
   cohorts                   CohortUser[]
   adminNote                 String?
@@ -45,29 +41,6 @@ model CohortUser {
   cohort   Cohort @relation(fields: [cohortId], references: [id], onDelete: Cascade)
 
   @@id([userId, cohortId])
-}
-
-model Message {
-  id          Int       @id @default(autoincrement())
-  body        String?
-  mediaUrl    String?
-  sender      User      @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
-  senderId    Int
-  receiver    User      @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
-  receiverId  Int
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  thread      Thread?   @relation("ThreadMessages", fields: [threadId], references: [id], onDelete: Cascade)
-  threadId    Int?
-  scheduledAt DateTime?
-  triggerAt   DateTime?
-  isSent      Boolean?  @default(false)
-}
-
-model Thread {
-  id           Int       @id @default(autoincrement())
-  participants User[]    @relation("ThreadParticipants")
-  messages     Message[] @relation("ThreadMessages")
 }
 
 model MessageTemplate {
